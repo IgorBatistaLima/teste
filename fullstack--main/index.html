@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Deals Games</title>
+  </head>
+  <body>
+    <h1>Deals Games</h1>
+    <form id="search-form" onsubmit="searchGame(event)">
+      <input type="text" id="search-input" placeholder="Search for a game" />
+      <button type="submit">Search</button>
+      <label for="store">Loja:</label>
+      <select id="store" name="store">
+        <option value=""></option>
+      </select>
+    </form>
+    <div id="deals"></div>
+    <script src="index.js"></script>
+  </body>
+</html>
