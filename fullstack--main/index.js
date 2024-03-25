@@ -1,7 +1,9 @@
-
 const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-const targetUrl = `https://www.cheapshark.com/api/1.0/deals?storeID=&upperPrice=15`;
-
+const targetUrl = 'https://www.cheapshark.com/api/1.0/deals?storeID=&upperPrice=15';
+const filterOptions = {
+  storeID: "",
+  title: "",
+}
 
 fetch(proxyUrl + targetUrl)
   .then((response) => response.json())
@@ -11,20 +13,31 @@ fetch(proxyUrl + targetUrl)
   .catch((error) => console.log("error", error));
 
 function getDeals() {
-  const storeSelect = document.getElementById("store");
-  const selectedStoreId = storeSelect.value;
+  filterOptions.storeID = document.getElementById("store").value;
 
+  if (!storeID) {
+    alert("Por favor, preencha o campo storeID.");
+    return;
+  }
 
   var requestOptions = {
     method: "GET",
     redirect: "follow",
+    mode: "no-cors",
   };
 
   fetch(
-    `https://www.cheapshark.com/api/1.0/deals?storeID=${selectedStoreId}&upperPrice=15`,
+    `https://www.cheapshark.com/api/1.0/deals?storeID=${filterOptions.storeID}&upperPrice=15`,
     requestOptions
   )
     .then((response) => response.json())
+    .then((response) => {
+      if(response.status === 429) {
+        setTimeout(getDeals, 1000);
+      } else {
+        return response.json();
+      }
+    })
     .then((data) => {
       const dealsContainer = document.getElementById("deals");
       dealsContainer.innerHTML = "";
@@ -36,7 +49,7 @@ function getDeals() {
         dealElement.innerHTML = `
        <h2>${deal.title}</h2>
         <img src="${deal.thumb}">
-        <p>Normal Price: $${deal.normalPrice}</p>${deal.saveInteger = parseInt(deal.savings)}%</p>
+        <p>Normal Price: $${deal.normalPrice}</p><p>${deal.saveInteger = parseInt(deal.savings)}%</p>
         <p>Sale Price: $${deal.salePrice}</p>
         <p>DealID: ${deal.dealID}</p> 
         <a href="https://www.cheapshark.com/redirect?dealID=${deal.dealID}" target="_blank">View Deal</a>
@@ -47,6 +60,7 @@ function getDeals() {
 }
 
 const storeSelect = document.getElementById("store");
+
 storeSelect.addEventListener("change", getDeals);
 
 fetch("https://www.cheapshark.com/api/1.0/stores")
@@ -70,10 +84,9 @@ fetch("https://www.cheapshark.com/api/1.0/stores")
 function searchGame(event) {
   event.preventDefault();
 
-  let searchInput = document.getElementById("search-input").value;
-  searchInput = encodeURIComponent(searchInput);
+  filterOptions.title = document.getElementById("search-input").value;
 
-  fetch(`https://www.cheapshark.com/api/1.0/games?title=${searchInput}`)
+  fetch(`https://www.cheapshark.com/api/1.0/games?title=${filterOptions.title}&storeID=${filterOptions.storeID}`)
     .then((response) => response.json())
     .then((data) => {
       if (data && data.length > 0) {
